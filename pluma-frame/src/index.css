@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-base-950: #0a0a0c;
+  --color-base-900: #111114;
+  --color-base-850: #16161b;
+  --color-base-800: #1c1c22;
+  --color-base-700: #2a2a33;
+  --color-base-600: #3a3a45;
+  --color-base-500: #5b5b68;
+  --color-base-400: #85858f;
+  --color-base-300: #a8a8b3;
+  --color-base-200: #cfcfd6;
+  --color-base-100: #eeeef1;
+
+  --color-accent-500: #6366f1;
+  --color-accent-400: #818cf8;
+  --color-accent-600: #4f46e5;
+
+  --radius-panel: 0.75rem;
+}
+
+@layer base {
+  * {
+    border-color: theme(--color-base-700);
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-base-950 text-base-100 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-base-600);
+    border-radius: 999px;
+  }
+}
+
+@layer utilities {
+  .checker-bg {
+    background-image:
+      linear-gradient(45deg, #26262e 25%, transparent 25%),
+      linear-gradient(-45deg, #26262e 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #26262e 75%),
+      linear-gradient(-45deg, transparent 75%, #26262e 75%);
+    background-size: 20px 20px;
+    background-position:
+      0 0,
+      0 10px,
+      10px -10px,
+      -10px 0px;
+    background-color: #1c1c22;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
