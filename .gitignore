@@ -6,3 +6,8 @@ build/
 .env.local
 .DS_Store
 Thumbs.db
+
+# BrandBird reference archive — evidence only, never shipped or committed
+.audit/
+next/tests-e2e/qa-export.png
+*.tsbuildinfo
