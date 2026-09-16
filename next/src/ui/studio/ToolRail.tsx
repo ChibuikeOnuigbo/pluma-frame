@@ -4,7 +4,7 @@ import { store, useChibuike, ChibuikeTool } from '../../chibuike/chibuikeStore';
 import { chibuikeMakeImage, chibuikeMakeMockup } from '../../chibuike/chibuikeFactories';
 import { chibuikeAssets } from '../../chibuike/chibuikeAssets';
 import { Icon, ChibuikeIconName } from '../Icon';
-import { ChibuikePopover, MenuItem } from '../Overlay';
+import { ChibuikePopover, MenuItem, useDraggableBox } from '../Overlay';
 
 interface ToolDef { id: ChibuikeTool | '@crop' | '@mockup' | '@image' | '@iconpick'; label: string; sc: string; icon: ChibuikeIconName; }
 
@@ -75,7 +75,7 @@ export function ToolRail() {
               aria-label={t.label}
               onClick={() => fire(t)}
             >
-              <Icon name={t.icon} size={17} />
+              <Icon name={t.icon} size={19} />
             </button>
           ))}
         </div>
@@ -108,12 +108,17 @@ export function ToolRail() {
 }
 
 function IconPicker({ onClose }: { onClose: () => void }) {
+  const pickerDrag = useDraggableBox();
   const [q, setQ] = useState('');
   const [defs, setDefs] = useState<{ name: string; path: string; tags: string }[]>([]);
   useEffect(() => { void import('../../chibuike/chibuikeIcons').then(m => setDefs(m.chibuikeSearchIcons(q))); }, [q]);
   return (
-    <div className="pf-pop" style={{ position: 'fixed', left: 58, top: 64, width: 268, maxHeight: 420, overflow: 'auto', zIndex: 90, animation: 'pf-pop-in .13s ease' }}>
+    <div className="pf-pop" ref={pickerDrag.ref} onPointerDown={pickerDrag.onPointerDown} data-drag-handle title="Drag to move"
+      style={pickerDrag.pos
+        ? { position: 'fixed', left: pickerDrag.pos.x, top: pickerDrag.pos.y, width: 268, maxHeight: 420, overflow: 'auto', zIndex: 90 }
+        : { position: 'fixed', left: 58, top: 64, width: 268, maxHeight: 420, overflow: 'auto', zIndex: 90, animation: 'pf-pop-in .13s ease' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <span className="pf-panel-grip" data-drag-handle title="Drag to move" style={{ position: 'static' }}><Icon name="grip" size={13} /></span>
         <Icon name="search" size={14} className="pf-muted" />
         <input autoFocus type="text" placeholder="Search icons" value={q}
           onChange={e => { setQ(e.target.value); void import('../../chibuike/chibuikeIcons').then(m => setDefs(m.chibuikeSearchIcons(e.target.value))); }}

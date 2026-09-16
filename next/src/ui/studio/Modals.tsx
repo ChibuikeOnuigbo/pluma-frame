@@ -2,6 +2,7 @@
 // Small, focused surfaces; scroll internally; own their own keys.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '../Icon';
+import { useDraggableBox } from '../Overlay';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 import { chibuikeExportWarnings, chibuikeEncode, chibuikeDownload, chibuikeExportSVG, chibuikeExportSizes, CHIBUIKE_SOCIAL_SIZES, CHIBUIKE_DEVICE_SIZES } from '../../chibuike/chibuikeExport';
 import { chibuikeEncodeWebM } from '../../chibuike/chibuikeVideo';
@@ -12,9 +13,16 @@ function Veil({ onClose, children, wide }: { onClose: () => void; children: Reac
     window.addEventListener('keydown', k, true);
     return () => window.removeEventListener('keydown', k, true);
   }, [onClose]);
+  const drag = useDraggableBox();
   return (
     <div className="pf-modal-veil" onPointerDown={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`pf-modal${wide ? ' wide' : ''}`} role="dialog" aria-modal="true">{children}</div>
+      <div
+        ref={drag.ref} onPointerDown={drag.onPointerDown} data-drag-handle title="Drag to move"
+        className={`pf-modal${wide ? ' wide' : ''}`} role="dialog" aria-modal="true"
+        style={drag.pos ? { position: 'fixed', left: drag.pos.x, top: drag.pos.y, margin: 0 } : undefined}
+      >
+        {children}
+      </div>
     </div>
   );
 }

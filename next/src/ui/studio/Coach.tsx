@@ -5,6 +5,7 @@
  * skip, and nudges with a short hint on wrong clicks.
  */
 import { useEffect, useRef, useState } from 'react';
+import { useDraggableBox } from '../Overlay';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 
 interface Step {
@@ -73,6 +74,9 @@ export function Coach({ onDone }: { onDone: () => void }) {
 
   const s = STEPS[step];
 
+  const drag = useDraggableBox();
+  useEffect(() => { drag.reset(); }, [s.target, drag.reset]);
+
   useEffect(() => {
     const find = () => document.querySelector(`[data-tut="${s.target}"]`) as HTMLElement | null;
     const update = () => {
@@ -100,6 +104,7 @@ export function Coach({ onDone }: { onDone: () => void }) {
     const onDown = (e: MouseEvent) => {
       if (step === STEPS.length - 1) return;
       const el = document.querySelector(`[data-tut="${s.target}"]`);
+      if ((e.target as HTMLElement).closest?.('.pf-coach')) return;
       if (el && !el.contains(e.target as Node)) {
         wrongRef.current++;
         setHint(true);
@@ -134,7 +139,12 @@ export function Coach({ onDone }: { onDone: () => void }) {
         </div>
       )}
       <style>{`@keyframes pf-pulse { 0%,100% { outline-offset: 0px; } 50% { outline: 3px solid rgba(124,92,255,.6); outline-offset: 4px; } }`}</style>
-      <div className="pf-coach" style={{ ...pos, position: 'fixed' }} role="dialog" aria-live="polite">
+      <div
+        className="pf-coach" ref={drag.ref} onPointerDown={drag.onPointerDown}
+        data-drag-handle title="Drag to move"
+        style={drag.pos ? { position: 'fixed', left: drag.pos.x, top: drag.pos.y } : { ...pos, position: 'fixed' }}
+        role="dialog" aria-live="polite"
+      >
         <h5>{s.title}</h5>
         <div>{s.body}</div>
         {hint && <div className="pf-coach-hint">Not there yet — {step === 0 ? 'add an image first' : 'try the highlighted control'}.</div>}

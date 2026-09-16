@@ -13,7 +13,7 @@ export type ChibuikeIconName =
   | 'trash' | 'more' | 'panelRight' | 'sliders' | 'alignLeft' | 'alignCenterH' | 'alignRight'
   | 'alignTop' | 'alignCenterV' | 'alignBottom' | 'distributeH' | 'distributeV'
   | 'group' | 'toFront' | 'toBack' | 'up' | 'down' | 'check' | 'alert' | 'info' | 'checkCircle'
-  | 'sparkle' | 'flipH' | 'flipV' | 'rotate' | 'wand' | 'keyboard' | 'external' | 'search'
+  | 'sparkle' | 'flipH' | 'flipV' | 'rotate' | 'wand' | 'keyboard' | 'external' | 'search' | 'grip'
   | 'clipboard' | 'film' | 'vector' | 'grid' | 'ruler' | 'text' | 'transparent';
 
 const P: Record<ChibuikeIconName, { d: string[]; fill?: boolean; extra?: string[] }> = {
@@ -98,12 +98,13 @@ const P: Record<ChibuikeIconName, { d: string[]; fill?: boolean; extra?: string[
   film: { d: ['M3 4h18v16H3z', 'M7 4v16', 'M17 4v16', 'M3 9h4', 'M3 15h4', 'M17 9h4', 'M17 15h4'] },
   vector: { d: ['M5 5h4v4H5z', 'M15 15h4v4h-4z', 'M7 9c0 5 3 8 8 8', 'M5 3v2M5 9v2M3 7h2M9 7h2M17 19h2M13 17h2'] },
   grid: { d: ['M4 4h7v7H4z', 'M13 4h7v7h-7z', 'M4 13h7v7H4z', 'M13 13h7v7h-7z'] },
+  grip: { d: ['M9 5.5h.01M15 5.5h.01M9 12h.01M15 12h.01M9 18.5h.01M15 18.5h.01'] },
   ruler: { d: ['M3 15 15 3l6 6L9 21z', 'M7 11l2 2', 'M10 8l2 2', 'M13 5l2 2'] },
   text: { d: ['M5 7V5h14v2', 'M12 5v14', 'M9 19h6'] },
   transparent: { d: ['M4 4h16v16H4z', 'M4 4l16 16', 'M12 4v4M4 12h4M16 20v-4M20 12h-4'] },
 };
 
-export function Icon({ name, size = 17, className, strokeWidth = 1.8 }: {
+export function Icon({ name, size = 17, className, strokeWidth = 2.2 }: {
   name: ChibuikeIconName; size?: number; className?: string; strokeWidth?: number;
 }) {
   const def = P[name];

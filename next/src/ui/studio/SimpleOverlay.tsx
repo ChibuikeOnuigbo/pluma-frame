@@ -2,6 +2,7 @@
 // shadow and mockup, then Download. Studio power stays one click away.
 import { useRef, useState } from 'react';
 import { Icon } from '../Icon';
+import { useDraggableBox } from '../Overlay';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 import { chibuikeAssets } from '../../chibuike/chibuikeAssets';
 import { chibuikePaletteFromCanvas, chibuikeGradientFromPalette, chibuikeMeshPresets } from '../../chibuike/chibuikeColor';
@@ -40,6 +41,8 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
   const [panel, setPanel] = useState<'presets' | 'background' | 'mockup' | null>('presets');
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const dockDrag = useDraggableBox();
+  const panelDrag = useDraggableBox();
   const sel = store.selected();
   const primary = sel.find(o => o.kind === 'image') ?? sel[0];
   const hasDoc = store.doc.objects.length > 0;
@@ -87,7 +90,9 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
   return (
     <>
       {/* top dock */}
-      <div className="pf-simple-dock" data-tut="simple-dock">
+      <div className="pf-simple-dock" data-tut="simple-dock" ref={dockDrag.ref} onPointerDown={dockDrag.onPointerDown}
+        style={dockDrag.pos ? { left: dockDrag.pos.x, top: dockDrag.pos.y, transform: 'none' } : undefined}>
+        <span className="pf-dock-grip" data-drag-handle title="Drag to move"><Icon name="grip" size={14} /></span>
         <button className="pf-icon-btn" title="Upload another image" aria-label="Upload another image" onClick={() => fileRef.current?.click()}>
           <Icon name="upload" size={15} />
         </button>
@@ -109,7 +114,10 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
 
       {/* left panel */}
       {panel && (
-        <div className="pf-simple-side left" data-tut="simple-panel">
+        <div className="pf-simple-side left" data-tut="simple-panel" ref={panelDrag.ref} onPointerDown={panelDrag.onPointerDown}
+          data-drag-handle
+          style={panelDrag.pos ? { left: panelDrag.pos.x, top: panelDrag.pos.y, transform: 'none', right: 'auto', bottom: 'auto' } : undefined}>
+          <span className="pf-panel-grip" data-drag-handle title="Drag to move"><Icon name="grip" size={13} /></span>
           {panel === 'presets' && (
             <>
               <h4>Frame & shadow</h4>

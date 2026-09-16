@@ -20,6 +20,7 @@ import { Timeline } from './Timeline';
 import { ChibuikeModals } from './Modals';
 import { ChibuikeToasts } from './Toasts';
 import { Coach, chibuikeTutorialDone } from './Coach';
+import { useDraggableBox } from '../Overlay';
 import { chibuikeLoadShortcuts } from '../../chibuike/chibuikeStore';
 
 /* ── error boundary ─────────────────────────────────────────────────────── */
@@ -109,6 +110,7 @@ export default function Studio() {
   const [hud, setHud] = useState('');
   const [coach, setCoach] = useState(false);
   const [recovered, setRecovered] = useState<ChibuikeDoc | null>(null);
+  const recDrag = useDraggableBox();
 
   // Chibuike QA hook — lets browser tests drive/inspect the real engine.
   useEffect(() => {
@@ -348,7 +350,8 @@ export default function Studio() {
       {coach && <Coach onDone={() => setCoach(false)} />}
       {recovered && (
         <div className="pf-modal-veil" style={{ zIndex: 400 }}>
-          <div className="pf-modal" style={{ maxWidth: 420 }}>
+          <div className="pf-modal" data-drag-handle title="Drag to move" ref={recDrag.ref} onPointerDown={recDrag.onPointerDown}
+            style={recDrag.pos ? { position: 'fixed', left: recDrag.pos.x, top: recDrag.pos.y, margin: 0, maxWidth: 420 } : { maxWidth: 420 }}>
             <div className="pf-modal-head"><h3>Recover your last session?</h3></div>
             <div className="pf-modal-body pf-muted">
               An autosave from <b>{new Date(recovered.meta.updatedAt).toLocaleString()}</b> was found

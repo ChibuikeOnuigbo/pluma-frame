@@ -524,10 +524,33 @@ kbd {
 
 /* tiny screens: dock drops the annotate button (topbar already toggles mode) */
 @media (max-width: 480px) {
-  .pf-simple-dock { gap: 1px !important; left: calc(50% + 23px) !important; max-width: calc(100vw - 66px) !important; }
+  .pf-simple-dock { gap: 1px !important; left: calc(50% + 23px) !important; max-width: calc(100vw - 66px) !important; padding: 2px 3px !important; }
   .pf-simple-dock .pf-dock-mode { display: none; }
-  .pf-simple-dock .pf-dock-tab { padding: 0 4px !important; font-size: 11px !important; }
+  .pf-simple-dock .pf-dock-grip { width: 16px; }
+  .pf-simple-dock .pf-dock-tab { padding: 0 3px !important; font-size: 10.5px !important; }
+  .pf-simple-dock .pf-sep { margin: 0 2px !important; }
+  .pf-simple-dock .pf-btn.small { padding: 5px 7px !important; }
 }
+
+/* ── draggable floating boxes ─────────────────────────────────────────── */
+.pf-coach { touch-action: none; cursor: grab; }
+.pf-coach:active { cursor: grabbing; }
+.pf-dock-grip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; align-self: stretch; flex: none; color: var(--pf-text-3);
+  cursor: grab; touch-action: none; border-right: 1px solid var(--pf-border);
+}
+.pf-dock-grip:active { cursor: grabbing; color: var(--pf-text-2); }
+.pf-panel-grip {
+  position: absolute; top: 6px; right: 6px; display: inline-flex; padding: 3px;
+  color: var(--pf-text-3); cursor: grab; touch-action: none;
+}
+.pf-panel-grip:hover { color: var(--pf-text-2); }
+.pf-panel-grip:active { cursor: grabbing; }
+.pf-modal { cursor: default; }
+.pf-modal[data-drag-handle] { cursor: grab; }
+.pf-modal[data-drag-handle]:active { cursor: grabbing; }
+.pf-simple-side h4 { cursor: grab; touch-action: none; }
 
 /* touch: no hover tooltips */
 @media (hover: none) {

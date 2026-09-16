@@ -2,7 +2,8 @@
  * Chibuike overlay primitives — anchored popovers, custom select, menus.
  * Close on outside click and Escape, stay inside the viewport, animate in.
  */
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 
 export function useChibuikePopover() {
   const [open, setOpen] = useState(false);
@@ -125,4 +126,60 @@ export function useMediaQuery(query: string): boolean {
     return () => mq.removeEventListener('change', on);
   }, [query]);
   return match;
+}
+
+/* ── draggable floating boxes ────────────────────────────────────────────────
+ * Floating overlays (coach, panels, docks, modals, pickers) can block the
+ * canvas on small screens — every one of them is draggable. Mark a handle
+ * region with [data-drag-handle] (or mark the whole box) and attach the
+ * returned ref + onPointerDown to the box element. Buttons/inputs inside keep
+ * working; on first drag the box converts to explicit left/top (class-based
+ * centering transforms are cleared) and stays clamped inside the viewport. */
+export function useDraggableBox() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const el = ref.current;
+    if (!el) return;
+    const t = e.target as HTMLElement;
+    if (t.closest('button, input, textarea, select, a, label')) return; // controls stay interactive
+    const handle = t.closest('[data-drag-handle]');
+    if (!handle || !el.contains(handle)) return; // drag must start on a handle region
+    const r = el.getBoundingClientRect();
+    // Absolute-positioned boxes live in their offsetParent's coordinate space,
+    // not the viewport's — convert so the box doesn't jump on drag start.
+    const op = el.offsetParent as HTMLElement | null;
+    const opr = op?.getBoundingClientRect();
+    const opcs = op ? getComputedStyle(op) : null;
+    const baseX = opr ? opr.left + (parseFloat(opcs?.borderLeftWidth || '0') || 0) : 0;
+    const baseY = opr ? opr.top + (parseFloat(opcs?.borderTopWidth || '0') || 0) : 0;
+    el.style.left = `${r.left - baseX}px`;
+    el.style.top = `${r.top - baseY}px`;
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+    el.style.transform = 'none';
+    el.style.margin = '0';
+    const offX = e.clientX - r.left;
+    const offY = e.clientY - r.top;
+    const move = (ev: PointerEvent) => {
+      // clamp in viewport space, then translate back to parent coords
+      const vx = Math.min(Math.max(4, ev.clientX - offX), window.innerWidth - el.offsetWidth - 4);
+      const vy = Math.min(Math.max(4, ev.clientY - offY), window.innerHeight - el.offsetHeight - 4);
+      el.style.left = `${vx - baseX}px`;
+      el.style.top = `${vy - baseY}px`;
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      setPos({ x: parseFloat(el.style.left || '0'), y: parseFloat(el.style.top || '0') });
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    e.preventDefault();
+  };
+  const reset = useCallback(() => setPos(null), []);
+  return { ref, onPointerDown, pos, reset };
 }
