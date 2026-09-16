@@ -67,7 +67,7 @@ function Palette({ onClose }: { onClose: () => void }) {
       { id: 'x.export', label: 'Export…', run: () => { store.modalOpen = 'export'; store.bumpReact(); } },
       { id: 'x.sizes', label: 'Resize canvas / presets…', run: () => { store.modalOpen = 'sizes'; store.bumpReact(); } },
       { id: 'x.keys', label: 'Keyboard shortcuts', run: () => { store.modalOpen = 'shortcuts'; store.bumpReact(); } },
-      { id: 'x.save', label: 'Save project', run: () => { store.toast('Autosave runs continuously — use the top bar to download a project file.', 'info'); } },
+      { id: 'x.save', label: 'Save project', run: () => { store.toast('Autosave runs continuously. Use the top bar to download a project file.', 'info'); } },
     ];
     for (const s of CHIBUIKE_SOCIAL_SIZES) {
       list.push({ id: `sz.${s.name}`, label: `Resize: ${s.name} (${s.w}×${s.h})`, run: () => store.resizeCanvas(s.w, s.h, 'scale') });
@@ -139,7 +139,7 @@ function ExportModal({ onClose }: { onClose: () => void }) {
         )}
         <div className="pf-row" style={{ marginBottom: 10 }}>
           <label className="grow" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span className="pf-tiny pf-muted">Resolution — {Math.round(doc.width * es.scale)}×{Math.round(doc.height * es.scale)}</span>
+            <span className="pf-tiny pf-muted">Resolution: {Math.round(doc.width * es.scale)}×{Math.round(doc.height * es.scale)}</span>
             <div className="pf-seg">
               {[1, 2, 3, 4].map(s => <button key={s} className={es.scale === s ? 'on' : ''} onClick={() => setES({ scale: s })}>{s}×</button>)}
             </div>
@@ -163,7 +163,7 @@ function ExportModal({ onClose }: { onClose: () => void }) {
           <button className="pf-btn" disabled={!!busy} onClick={() => void doExport('webm')} title="Renders the animated composition">
             {busy === 'webm' ? 'Rendering…' : 'WebM (animation)'}
           </button>
-          <button className="pf-btn" disabled title="GIF export is intentionally off — WebM is sharper and far smaller.">GIF (off)</button>
+          <button className="pf-btn" disabled title="GIF export is intentionally off. WebM is sharper and far smaller.">GIF (off)</button>
         </div>
         <div className="pf-row" style={{ marginTop: 12 }}>
           <button className="pf-chip" onClick={() => void chibuikeExportSizes(doc, CHIBUIKE_SOCIAL_SIZES.slice(0, 4), Math.min(es.scale, 2), es.format === 'png' ? 'png' : 'png')}>Batch: first 4 social sizes</button>
@@ -172,7 +172,7 @@ function ExportModal({ onClose }: { onClose: () => void }) {
       </div>
       <div className="pf-modal-foot">
         <span className="pf-tiny pf-muted" style={{ marginRight: 'auto' }}>
-          Renders offscreen at full resolution — preview zoom never affects output.
+          Renders offscreen at full resolution. Preview zoom never affects output.
         </span>
         <button className="pf-btn small" onClick={onClose}>Close</button>
       </div>
@@ -214,7 +214,7 @@ function SizesModal({ onClose }: { onClose: () => void }) {
           <button className="pf-chip" onClick={() => { store.resizeCanvas(custom.w, custom.h, 'raw'); }}>Raw canvas</button>
         </div>
         <p className="pf-tiny pf-muted" style={{ marginTop: 10 }}>
-          “Scale content” reflows every object proportionally (auto-resize). “Raw canvas” just changes the artboard.
+          “Scale content” reflows every object proportionally (auto resize). “Raw canvas” just changes the artboard.
         </p>
       </div>
     </Veil>
@@ -234,8 +234,8 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
     ['[ · ]', 'Send backward · forward'],
     ['Arrows', 'Nudge (Shift = 10px)'],
     ['0 · 1', 'Fit · 100%'],
-    ['Wheel', 'Zoom at cursor'], ['Middle-drag / Space', 'Pan'],
-    ['Alt-drag', 'Duplicate-drag'], ['Shift-drag', 'Constrain'],
+    ['Wheel', 'Zoom at cursor'], ['Middle drag / Space', 'Pan'],
+    ['Alt drag', 'Duplicate drag'], ['Shift drag', 'Constrain'],
     ['Enter', 'Edit text'], ['Esc', 'Deselect / cancel'],
   ];
   return (

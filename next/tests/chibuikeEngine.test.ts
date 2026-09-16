@@ -6,7 +6,7 @@ import { ChibuikeHistory } from '../src/chibuike/chibuikeHistory';
 import { chibuikeId } from '../src/chibuike/chibuikeIds';
 import { chibuikeSimplify, chibuikeRotatedBounds, chibuikeSnapMove, chibuikeRectsUnion } from '../src/chibuike/chibuikeGeom';
 import { chibuikeMakeText, chibuikeMakeRect, chibuikeMakeArrow } from '../src/chibuike/chibuikeFactories';
-import { chibuikeHexToRgb, chibuikeRgbToHex, chibuikeMix, chibuikeLuminance, chibuikeGradientFromPalette } from '../src/chibuike/chibuikeColor';
+import { chibuikeHexToRgb, chibuikeRgbToHex, chibuikeMix, chibuikeLuminance, chibuikeGradientFromPalette, chibuikeTextLegibility } from '../src/chibuike/chibuikeColor';
 import { chibuikeEase } from '../src/chibuike/chibuikeRenderPure';
 import { CHIBUIKE_CAPABILITIES } from '../src/chibuike/chibuikeCapabilities';
 import { chibuikeQRModules } from '../src/chibuike/chibuikeQR';
@@ -209,5 +209,37 @@ describe('chibuike capabilities', () => {
     expect(CHIBUIKE_CAPABILITIES.webmExport.enabled).toBe(true);
     expect(CHIBUIKE_CAPABILITIES.gifExport.enabled).toBe(false);
     expect(CHIBUIKE_CAPABILITIES.gifExport.reason).toBeTruthy();
+  });
+});
+
+describe('chibuike text legibility (contrast tips)', () => {
+  const leg = (color: string, bg: { color: string } | null, backdrop = '#ffffff') =>
+    chibuikeTextLegibility({ color, bg }, backdrop);
+
+  it('flags white text on a white backdrop, suggests a plate', () => {
+    const r = leg('#ffffff', null, '#ffffff');
+    expect(r.ok).toBe(false);
+    expect(r.tip).toContain('plate');
+    expect(r.ratio).toBeCloseTo(1, 1);
+  });
+
+  it('a dark plate rescues white text', () => {
+    const r = leg('#ffffff', { color: 'rgba(11,13,18,0.72)' }, '#ffffff');
+    expect(r.ok).toBe(true);
+    expect(r.ratio).toBeGreaterThan(6);
+  });
+
+  it('translucent plate alpha is composited before comparing', () => {
+    const solid = leg('#ffffff', { color: '#0b0d12' }, '#ffffff');
+    const sheer = leg('#ffffff', { color: 'rgba(11,13,18,0.72)' }, '#ffffff');
+    expect(solid.ratio).toBeGreaterThanOrEqual(sheer.ratio);
+    expect(sheer.ratio).toBeGreaterThan(3);
+  });
+
+  it('dark text on white passes; brighter tip direction flips for dark backdrops', () => {
+    expect(leg('#1a1d27', null, '#ffffff').ok).toBe(true);
+    const dark = leg('#14161d', null, '#0b0d12');
+    expect(dark.ok).toBe(false);
+    expect(dark.tip).toContain('brighter');
   });
 });

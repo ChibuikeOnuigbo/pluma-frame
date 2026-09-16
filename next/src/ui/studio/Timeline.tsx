@@ -64,7 +64,7 @@ export function Timeline() {
       if (!tracks.length) {
         ctx.fillStyle = '#6b7288';
         ctx.font = '12px -apple-system, sans-serif';
-        ctx.fillText('No animations yet — select an object and open the Animate tab.', 12, H / 2);
+        ctx.fillText('No animations yet. Select an object and open the Animate tab.', 12, H / 2);
       }
       // playhead
       const pxh = px(store.playhead);

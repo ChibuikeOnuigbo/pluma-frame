@@ -8,6 +8,8 @@ import { CHIBUIKE_FONTS } from '../../chibuike/chibuikeText';
 import { CHIBUIKE_ICONS } from '../../chibuike/chibuikeIcons';
 import { Icon } from '../Icon';
 import { Select } from '../Overlay';
+import { ChibuikeColorPicker } from '../ColorPicker';
+import { chibuikeTextLegibility, chibuikeParseCssColor } from '../../chibuike/chibuikeColor';
 
 /* ── primitives ─────────────────────────────────────────────────────────── */
 function Num({ value, onChange, unit, step = 1, min, max, label }: {
@@ -51,10 +53,7 @@ function Slider({ value, onChange, min, max, step = 1, label }: { value: number;
 }
 
 function Color({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
-  const hex = value?.startsWith('#') ? value.slice(0, 7) : '#ffffff';
-  return (
-    <input type="color" value={hex} onChange={e => onChange(e.target.value)} aria-label={label} title={value} />
-  );
+  return <ChibuikeColorPicker value={value} onChange={onChange} label={label} />;
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -198,14 +197,29 @@ function TextProps({ o }: { o: Extract<ChibuikeObject, { kind: 'text' }> }) {
         </Row>
       </Section>
       <Row label="Color"><Color label="Text color" value={o.color} onChange={v => set({ color: v })} /><span className="pf-tiny pf-muted">{o.color}</span></Row>
-      <Section title="Highlight background" onReset={() => set({ bg: null })}>
-        <div className="pf-row" style={{ flexWrap: 'wrap' }}>
-          <button className="pf-chip" onClick={() => set({ bg: { color: '#ffe94d', padX: 10, padY: 4, radius: 6 } })}>Yellow</button>
-          <button className="pf-chip" onClick={() => set({ bg: { color: '#7c5cff', padX: 12, padY: 6, radius: 999 } })}>Purple pill</button>
-          <button className="pf-chip" onClick={() => set({ bg: { color: '#0b0d12', padX: 12, padY: 6, radius: 10 } })}>Dark code</button>
-          {o.bg && <button className="pf-chip" onClick={() => set({ bg: null })}>None</button>}
-        </div>
-        {o.bg && <Row label="Pad"><Num value={o.bg.padX} onChange={v => set({ bg: { ...o.bg!, padX: v } })} /></Row>}
+      <LegibilityTip o={o} />
+      <Section title="Background plate" onReset={() => set({ bg: null })}>
+        {!o.bg && (
+          <div className="pf-row" style={{ flexWrap: 'wrap' }}>
+            <button className="pf-chip" onClick={() => set({ bg: { color: 'rgba(11,13,18,0.72)', padX: 12, padY: 7, radius: 10 } })}>Add plate</button>
+            <button className="pf-chip" onClick={() => set({ bg: { color: '#ffe94d', padX: 10, padY: 4, radius: 6 } })}>Yellow</button>
+            <button className="pf-chip" onClick={() => set({ bg: { color: '#7c5cff', padX: 12, padY: 6, radius: 999 } })}>Purple pill</button>
+          </div>
+        )}
+        {o.bg && (
+          <>
+            <Row label="Color"><Color label="Plate color" value={o.bg.color} onChange={v => set({ bg: { ...o.bg!, color: v } })} /></Row>
+            <Row label="Opacity"><Slider label="Plate opacity" min={0.05} max={1} step={0.05} value={chibuikeParseCssColor(o.bg.color).a}
+              onChange={a => { const c = chibuikeParseCssColor(o.bg!.color); set({ bg: { ...o.bg!, color: `rgba(${c.r},${c.g},${c.b},${a})` } }); }} /></Row>
+            <Row label="Padding"><Num value={o.bg.padX} onChange={v => set({ bg: { ...o.bg!, padX: v, padY: Math.round(v * 0.6) } })} /></Row>
+            <Row label="Radius"><Slider label="Plate radius" min={0} max={28} step={1} value={Math.min(28, o.bg.radius)} onChange={v => set({ bg: { ...o.bg!, radius: v } })} /></Row>
+            <div className="pf-row" style={{ flexWrap: 'wrap' }}>
+              <button className="pf-chip" onClick={() => set({ bg: { color: '#ffe94d', padX: 10, padY: 4, radius: 6 } })}>Yellow</button>
+              <button className="pf-chip" onClick={() => set({ bg: { color: '#7c5cff', padX: 12, padY: 6, radius: 999 } })}>Purple pill</button>
+              <button className="pf-chip" onClick={() => set({ bg: null })}>None</button>
+            </div>
+          </>
+        )}
       </Section>
       <ShadowSection o={o} />
     </>
@@ -459,7 +473,7 @@ function TransformProps({ o }: { o: ChibuikeObject }) {
       <Row label="Rotation"><Slider label="Rotation" value={o.rotation} min={-180} max={180} onChange={v => set({ rotation: v })} /><Num value={o.rotation} onChange={v => set({ rotation: v })} unit="°" /></Row>
       <Row label="Opacity"><Slider label="Opacity" value={o.opacity} min={0} max={1} step={0.01} onChange={v => set({ opacity: v })} /></Row>
       <Row label="Blend">
-        <Select value={o.blend} options={(['normal','multiply','screen','overlay','soft-light','difference'] as const).map(b => ({ value: b, label: b[0].toUpperCase()+b.slice(1) }))} onChange={v => set({ blend: v })} label="Blend mode" />
+        <Select value={o.blend} options={(['normal','multiply','screen','overlay','soft-light','difference'] as const).map(b => ({ value: b, label: (b[0].toUpperCase()+b.slice(1)).replace(/-/g, ' ') }))} onChange={v => set({ blend: v })} label="Blend mode" />
       </Row>
     </Section>
   );
@@ -510,6 +524,22 @@ function ArrangeSection() {
         <button className="pf-chip" onClick={() => store.pasteStyle()}>Paste style</button>
       </div>
     </Section>
+  );
+}
+
+/* ── legibility tip ─────────────────────────────────────────────────────── */
+function LegibilityTip({ o }: { o: Extract<ChibuikeObject, { kind: 'text' }> }) {
+  const bg = store.doc.background;
+  const backdrop = bg.type === 'solid' ? bg.color : bg.type === 'mesh' ? bg.base : bg.type === 'linear' ? (bg.stops[0]?.color ?? '#ffffff') : '#ffffff';
+  const leg = chibuikeTextLegibility({ color: o.color, bg: o.bg }, backdrop);
+  void chibuikeParseCssColor; // imported for plate controls above
+  if (leg.ok) return null;
+  return (
+    <div className="pf-tipbox" role="status">
+      <Icon name="alert" size={14} />
+      <span>{leg.tip}</span>
+      <button className="pf-chip" onClick={() => store.setProp(o.id, { bg: { color: 'rgba(11,13,18,0.72)', padX: 12, padY: 7, radius: 10 } }, 'Add plate')}>Add plate</button>
+    </div>
   );
 }
 
@@ -589,12 +619,12 @@ function AnimatePanel() {
   return (
     <div data-tut="animate">
       {!o ? <div className="pf-empty">Select an object to animate it.</div> : (
-        <Section title={`Animation — ${o.name}`} onReset={() => store.setProp(o.id, { anim: null }, 'Remove animation')}>
+        <Section title={`Animation: ${o.name}`} onReset={() => store.setProp(o.id, { anim: null }, 'Remove animation')}>
           <div className="pf-row" style={{ flexWrap: 'wrap' }}>
             {presets.map(p => (
               <button key={p} className={`pf-chip${o.anim?.preset === p ? ' on' : ''}`}
                 onClick={() => store.setProp(o.id, { anim: { preset: p, duration: 0.8, delay: 0, easing: p === 'bounce' ? 'bounce-out' : p === 'pop' ? 'back-out' : 'ease-out', loop: p === 'float' || p === 'pulse' } }, 'Animation')}>
-                {p}
+                {p.replace(/-/g, ' ')}
               </button>
             ))}
           </div>
@@ -603,7 +633,7 @@ function AnimatePanel() {
               <Row label="Duration"><Slider label="Duration" value={o.anim.duration} min={0.2} max={4} step={0.05} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, duration: v } }, 'Duration')} /><Num value={o.anim.duration} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, duration: v } }, 'Duration')} unit="s" step={0.05} min={0.1} /></Row>
               <Row label="Delay"><Slider label="Delay" value={o.anim.delay} min={0} max={4} step={0.05} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, delay: v } }, 'Delay')} /><Num value={o.anim.delay} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, delay: v } }, 'Delay')} unit="s" step={0.05} min={0} /></Row>
               <Row label="Easing">
-                <Select value={o.anim.easing} options={(['linear','ease','ease-out','ease-in','ease-in-out','spring','bounce-out','back-out'] as const).map(e => ({ value: e, label: e }))} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, easing: v } }, 'Easing')} label="Easing" />
+                <Select value={o.anim.easing} options={(['linear','ease','ease-out','ease-in','ease-in-out','spring','bounce-out','back-out'] as const).map(e => ({ value: e, label: e.replace(/-/g, ' ') }))} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, easing: v } }, 'Easing')} label="Easing" />
               </Row>
               <Row label="Loop"><input type="checkbox" checked={o.anim.loop} onChange={e => store.setProp(o.id, { anim: { ...o.anim!, loop: e.target.checked } }, 'Loop')} /><span className="pf-tiny pf-muted">float · pulse · shake</span></Row>
               <div className="pf-row">

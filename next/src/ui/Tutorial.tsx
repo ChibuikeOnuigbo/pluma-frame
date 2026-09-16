@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { chibuikeResetTutorial } from './studio/Coach';
 
 const CHAPTERS = [
-  { id: 'upload', title: 'Upload & paste', img: '/demo/dashboard.png', body: 'Drop a file, paste from your clipboard, or click Upload on the landing page. The canvas snaps to your image\'s real resolution — your source pixels are preserved for export, always.' },
+  { id: 'upload', title: 'Upload & paste', img: '/demo/dashboard.png', body: 'Drop a file, paste from your clipboard, or click Upload on the landing page. The canvas snaps to your image\'s real resolution: your source pixels are preserved for export, always.' },
   { id: 'background', title: 'Backgrounds', img: '/demo/photo.png', body: 'Solid, gradients, mesh gradients, patterns and blurred image backgrounds. “Match my image” samples the real colors inside your screenshot and builds a tasteful gradient from them.' },
-  { id: 'mockup', title: 'Mockups', img: '/demo/appui.png', body: 'Wrap your screenshot in a browser, Mac, laptop or phone frame. The frame is procedural — crisp at any zoom — and your image becomes the screen content with cover/contain fitting.' },
+  { id: 'mockup', title: 'Mockups', img: '/demo/appui.png', body: 'Wrap your screenshot in a browser, Mac, laptop or phone frame. The frame is procedural, crisp at any zoom, and your image becomes the screen content with cover/contain fitting.' },
   { id: 'annotate', title: 'Annotate', img: '/demo/dashboard.png', body: 'Arrows with curve control, numbered steps, callout bubbles, pixelate/blur redaction, spotlights and zoom cutouts. Everything is an object: move it, restyle it, delete it.' },
   { id: 'layers', title: 'Layers', img: '/demo/photo.png', body: 'The layers tab lists every object top-first. Rename, hide, lock, drag to reorder, group. Select multiple with marquee or Shift-click and align/distribute in one tap.' },
-  { id: 'animate', title: 'Animate (lightly)', img: '/demo/appui.png', body: 'Give any object an entrance — fade, pop, slide, blur-in — with duration, delay and easing. Press Space to preview, then export a WebM rendered frame-accurately.' },
-  { id: 'export', title: 'Export', img: '/demo/dashboard.png', body: 'PNG / JPEG / WebP at 1×–4× with transparency, SVG for vector-only documents, WebM for animation. The exporter renders offscreen at full resolution — zoom never affects quality.' },
+  { id: 'animate', title: 'Animate (lightly)', img: '/demo/appui.png', body: 'Give any object an entrance: fade, pop, slide, blur in, with duration, delay and easing. Press Space to preview, then export a WebM rendered frame accurately.' },
+  { id: 'export', title: 'Export', img: '/demo/dashboard.png', body: 'PNG / JPEG / WebP at 1× to 4× with transparency, SVG for vector only documents, WebM for animation. The exporter renders offscreen at full resolution, so zoom never affects quality.' },
 ];
 
 export function Tutorial() {

@@ -128,8 +128,15 @@ export function Landing() {
         ctx.fillStyle = num.textColor; ctx.font = '700 22px sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText('1', num.x + 22, num.y + 23);
-        const tx = chibuikeMakeText('Revenue is up — highlight it', 700, 96, { size: 26, color: '#ffffff', weight: 700 });
+        const tx = chibuikeMakeText('Revenue is up. Highlight it.', 700, 96, { size: 26, color: '#ffffff', weight: 700, bg: { color: 'rgba(35,19,77,0.88)', padX: 14, padY: 8, radius: 10 } });
         ctx.font = `${tx.weight} ${tx.size}px sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        if (tx.bg) {
+          const tw = ctx.measureText(tx.text).width;
+          ctx.fillStyle = tx.bg.color;
+          ctx.beginPath();
+          ctx.roundRect(tx.x - tx.bg.padX, tx.y - tx.bg.padY, tw + tx.bg.padX * 2, tx.size * 1.25 + tx.bg.padY * 2, tx.bg.radius);
+          ctx.fill();
+        }
         ctx.fillStyle = tx.color;
         ctx.fillText(tx.text, tx.x, tx.y);
         ctx.restore();
@@ -155,7 +162,7 @@ export function Landing() {
 
       <header className="pf-landing-hero">
         <h1>Make any screenshot<br /><span className="grad">impossible to ignore</span></h1>
-        <p>Drop in a screenshot. Get a polished marketing visual — background, depth, shadow, annotations — in seconds. Free, fast, runs entirely in your browser.</p>
+        <p>Drop in a screenshot. Get a polished marketing visual: background, depth, shadow, annotations, all in seconds. Free, fast, runs entirely in your browser.</p>
         <div className="pf-cta-row">
           <label className="pf-btn primary" style={{ cursor: 'pointer' }}>
             Upload image
@@ -173,7 +180,7 @@ export function Landing() {
       <div className="pf-demo-wrap">
         <div className="pf-demo">
           <canvas ref={canvasRef} aria-label="Animated product demo" />
-          <div className="pf-demo-badge">live render — the real engine, not a video</div>
+          <div className="pf-demo-badge">live render: the real engine, not a video</div>
         </div>
         <div className="pf-steps">
           {CHIBUIKE_STEPS.map((s, i) => <span key={s} className={`pf-step${step >= i ? ' on' : ''}`}>{s}</span>)}
@@ -189,7 +196,7 @@ export function Landing() {
         <div className="pf-feat">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5" /></svg>
           <h3>Simple to Studio</h3>
-          <p>One-click presets when you want speed. Layers, transforms, animation and precise controls when you don't.</p>
+          <p>One click presets when you want speed. Layers, transforms, animation and precise controls when you don't.</p>
         </div>
         <div className="pf-feat">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18" /></svg>
@@ -199,12 +206,12 @@ export function Landing() {
         <div className="pf-feat">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16" /></svg>
           <h3>Export anywhere</h3>
-          <p>PNG, JPEG, WebP, SVG and animated WebM — at 1× to 4× resolution with transparent background support.</p>
+          <p>PNG, JPEG, WebP, SVG and animated WebM at 1× to 4× resolution, with transparent background support.</p>
         </div>
       </section>
 
       <footer className="pf-landing-foot">
-        Pluma Frame Next — engineered by Chibuike. Original software; open-source dependencies listed in ASSET_LICENSES.md.
+        Pluma Frame Next. Engineered by Chibuike. Original software; open source dependencies listed in ASSET_LICENSES.md.
       </footer>
     </div>
   );

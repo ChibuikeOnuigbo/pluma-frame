@@ -49,7 +49,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
 
   const randomFromImage = () => {
     const img = store.doc.objects.find(o => o.kind === 'image');
-    if (!img || !('assetId' in img) || !img.assetId) { store.toast('Add an image first — the palette comes from its colors.', 'info'); return; }
+    if (!img || !('assetId' in img) || !img.assetId) { store.toast('Add an image first. The palette comes from its colors.', 'info'); return; }
     const { src } = chibuikeAssets.paintSource(img.assetId, 128);
     if (!src) return;
     const swatches = chibuikePaletteFromCanvas(src);
@@ -61,7 +61,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
     void (async () => {
       const { chibuikeMakeMockup } = await import('../../chibuike/chibuikeFactories');
       const img = store.doc.objects.find(o => o.kind === 'image') as { assetId: string; x: number; y: number; w: number; h: number } | undefined;
-      if (!img) { store.toast('Add an image first — it becomes the screen content.', 'info'); return; }
+      if (!img) { store.toast('Add an image first. It becomes the screen content.', 'info'); return; }
       const w = device === 'phone' ? store.doc.width * 0.34 : img.w * 1.12;
       const h = device === 'phone' ? w * 2.05 : img.h * 1.25;
       const m = chibuikeMakeMockup(img.x - (w - img.w) / 2, img.y - (h - img.h) / 2, w, h, device, { assetId: img.assetId, name: `${device} mockup` });
@@ -71,7 +71,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
         d.objects.push(m);
       });
       store.select([m.id]);
-      store.toast(`${device} mockup — your image moved into the screen.`, 'ok');
+      store.toast(`${device} mockup: your image moved into the screen.`, 'ok');
     })();
   };
 
@@ -104,7 +104,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
           </button>
         ))}
         <div className="pf-sep pf-dock-mode" />
-        <button className="pf-icon-btn pf-dock-mode" title="Annotate — arrows, steps, text (Studio tools)" aria-label="Switch to Studio tools" onClick={() => store.setMode('studio')}>
+        <button className="pf-icon-btn pf-dock-mode" title="Annotate: arrows, steps, text (Studio tools)" aria-label="Switch to Studio tools" onClick={() => store.setMode('studio')}>
           <Icon name="pen" size={15} />
         </button>
         <button className="pf-btn small primary" onClick={() => void download()} disabled={busy}>

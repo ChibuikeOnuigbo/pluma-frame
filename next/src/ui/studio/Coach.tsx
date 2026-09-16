@@ -30,13 +30,13 @@ const STEPS: Step[] = [
   {
     target: 'canvas',
     title: '1 · Add your screenshot',
-    body: 'Drop or paste an image — or click the upload icon in the tool rail. The canvas resizes to fit it.',
+    body: 'Drop or paste an image, or click the upload icon in the tool rail. The canvas resizes to fit it.',
     waitFor: () => store.doc.objects.some(o => o.kind === 'image'),
   },
   {
     target: 'simple-panel',
     title: '2 · Style it in one click',
-    body: 'Open the Style panel in Simple mode and try a frame preset — rounded corners plus a soft shadow.',
+    body: 'Open the Style panel in Simple mode and try a frame preset: rounded corners plus a soft shadow.',
     waitFor: () => store.doc.objects.some(o => o.kind === 'image' && (o.radius > 0 || o.shadow !== null)),
   },
   {
@@ -48,7 +48,7 @@ const STEPS: Step[] = [
   {
     target: 'mode',
     title: '4 · Open Studio mode',
-    body: 'When you need arrows, steps or layers, click this toggle — the same document, full power.',
+    body: 'When you need arrows, steps or layers, click this toggle: the same document, full power.',
     waitFor: () => store.uiMode === 'studio',
   },
   {
@@ -147,7 +147,7 @@ export function Coach({ onDone }: { onDone: () => void }) {
       >
         <h5>{s.title}</h5>
         <div>{s.body}</div>
-        {hint && <div className="pf-coach-hint">Not there yet — {step === 0 ? 'add an image first' : 'try the highlighted control'}.</div>}
+        {hint && <div className="pf-coach-hint">Not there yet: {step === 0 ? 'add an image first' : 'try the highlighted control'}.</div>}
         <div className="row">
           <span className="pf-tiny pf-muted" style={{ marginRight: 'auto', alignSelf: 'center' }}>{step + 1} / {STEPS.length}</span>
           <button className="pf-chip" onClick={finish}>Skip</button>

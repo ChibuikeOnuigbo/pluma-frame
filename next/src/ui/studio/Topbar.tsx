@@ -99,14 +99,14 @@ export function Topbar({ onIngest }: { onIngest: (f: File) => void }) {
 
       <div className="spacer" />
 
-      <span className="pf-net" title={store.online ? 'Online — optional external imports available' : 'Offline — core editing unaffected'}>
+      <span className="pf-net" title={store.online ? 'Online: optional external imports available' : 'Offline: core editing unaffected'}>
         <span className={`pf-net-dot${store.online ? '' : ' off'}`} />
         {!store.online && <span className="pf-tiny">offline</span>}
       </span>
 
       <div className="pf-sep" />
       <button
-        className="pf-icon-btn" data-tut="mode" title={store.uiMode === 'simple' ? 'Studio mode — full editor' : 'Simple mode'}
+        className="pf-icon-btn" data-tut="mode" title={store.uiMode === 'simple' ? 'Studio mode: full editor' : 'Simple mode'}
         onClick={() => store.setMode(store.uiMode === 'simple' ? 'studio' : 'simple')}
       >
         <Icon name={store.uiMode === 'simple' ? 'sliders' : 'wand'} size={15} />
@@ -120,7 +120,7 @@ export function Topbar({ onIngest }: { onIngest: (f: File) => void }) {
       {!narrow && (
         <button className="pf-icon-btn" title="Copy image to clipboard" aria-label="Copy to clipboard" onClick={async () => {
           try { await chibuikeCopyToClipboard(doc, Math.min(doc.exportSettings.scale, 2)); store.toast('Image copied to clipboard', 'ok'); }
-          catch { store.toast('Clipboard blocked — use Export instead.', 'warn'); }
+          catch { store.toast('Clipboard blocked. Use Export instead.', 'warn'); }
         }}><Icon name="clipboard" size={15} /></button>
       )}
 
@@ -141,7 +141,7 @@ export function Topbar({ onIngest }: { onIngest: (f: File) => void }) {
           <MenuItem icon={<Icon name="folderOpen" size={14} />} onClick={() => { fileRef.current?.click(); setMorePop(false); }}>Open project file</MenuItem>
           <MenuItem icon={<Icon name="clipboard" size={14} />} onClick={async () => {
             try { await chibuikeCopyToClipboard(doc, Math.min(doc.exportSettings.scale, 2)); store.toast('Image copied to clipboard', 'ok'); }
-            catch { store.toast('Clipboard blocked — use Export instead.', 'warn'); }
+            catch { store.toast('Clipboard blocked. Use Export instead.', 'warn'); }
             setMorePop(false);
           }}>Copy image to clipboard</MenuItem>
           <MenuItem icon={<Icon name={store.uiMode === 'simple' ? 'sliders' : 'wand'} size={14} />} onClick={() => { store.setMode(store.uiMode === 'simple' ? 'studio' : 'simple'); setMorePop(false); }}>

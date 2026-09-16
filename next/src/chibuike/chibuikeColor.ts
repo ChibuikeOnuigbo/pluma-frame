@@ -77,3 +77,70 @@ export const chibuikeMeshPresets: { name: string; base: string; points: { x: num
   { name: 'Sunrise', base: '#fffbeb', points: [{ x: 0.25, y: 0.3, r: 0.5, color: '#fde68a' }, { x: 0.8, y: 0.35, r: 0.5, color: '#fca5a5' }, { x: 0.5, y: 0.9, r: 0.55, color: '#fdba74' }] },
   { name: 'Slate', base: '#f4f6fb', points: [{ x: 0.2, y: 0.2, r: 0.5, color: '#dbe3f5' }, { x: 0.8, y: 0.5, r: 0.55, color: '#c3cde8' }, { x: 0.45, y: 0.9, r: 0.5, color: '#e2e8f0' }] },
 ];
+
+/* ── contrast + legibility tips ─────────────────────────────────────────────
+ * WCAG-style contrast checks for canvas text. Used by the inspector to warn
+ * when text sits on a backdrop it will vanish into (white on white, etc) and
+ * to suggest a background plate. */
+
+export function chibuikeParseCssColor(css: string): { r: number; g: number; b: number; a: number } {
+  const s = (css ?? '').trim();
+  if (s.startsWith('#')) {
+    let h = s.slice(1);
+    if (h.length === 3 || h.length === 4) h = h.split('').map(c => c + c).join('');
+    if (h.length === 8) {
+      return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: parseInt(h.slice(6, 8), 16) / 255 };
+    }
+    const n = parseInt(h.slice(0, 6) || 'ffffff', 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255, a: 1 };
+  }
+  const m = s.match(/rgba?\(([^)]+)\)/);
+  if (m) {
+    const p = m[1].split(',').map(v => parseFloat(v));
+    return { r: p[0] || 0, g: p[1] || 0, b: p[2] || 0, a: p.length > 3 ? p[3] : 1 };
+  }
+  return { r: 255, g: 255, b: 255, a: 1 };
+}
+
+/** Composite a (possibly translucent) top color over an opaque bottom color. */
+export function chibuikeCompositeCss(top: string, bottom: string): string {
+  const t = chibuikeParseCssColor(top);
+  const b = chibuikeParseCssColor(bottom);
+  const a = t.a;
+  const r = t.r * a + b.r * (1 - a);
+  const g = t.g * a + b.g * (1 - a);
+  const bl = t.b * a + b.b * (1 - a);
+  return chibuikeRgbToHex(r, g, bl);
+}
+
+export function chibuikeContrastRatio(cssA: string, cssB: string): number {
+  const lum = (css: string) => {
+    const c = chibuikeParseCssColor(css);
+    const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+  };
+  const la = lum(cssA), lb = lum(cssB);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+export interface ChibuikeLegibility { ratio: number; ok: boolean; tip: string | null; }
+
+/**
+ * Would this text be readable on its effective backdrop?
+ * Backdrop = the background plate if present (alpha composited over the
+ * canvas backdrop), otherwise the canvas backdrop itself. Threshold 3:1,
+ * the WCAG AA bar for large text — annotation text is large text.
+ */
+export function chibuikeTextLegibility(
+  o: { color: string; bg: { color: string } | null },
+  backdropCss: string,
+): ChibuikeLegibility {
+  const plate = o.bg ? chibuikeCompositeCss(o.bg.color, backdropCss) : (backdropCss || '#ffffff');
+  const ratio = chibuikeContrastRatio(o.color || '#ffffff', plate);
+  if (ratio >= 3) return { ratio, ok: true, tip: null };
+  return {
+    ratio,
+    ok: false,
+    tip: `Low contrast (${ratio.toFixed(1)}:1). This text can vanish into the canvas. Add a background plate behind it, or pick a ${chibuikeLuminance(plate) > 0.4 ? 'darker' : 'brighter'} color.`,
+  };
+}

@@ -327,7 +327,7 @@ export default function Studio() {
               <div className="pf-upload-hero">
                 <label className="big" style={{ cursor: 'pointer' }}>
                   <div><b>Drop a screenshot here</b></div>
-                  <span className="pf-muted pf-tiny">or paste from clipboard · click to browse</span>
+                  <span className="pf-muted pf-tiny">or paste from clipboard, or click to browse</span>
                   <input type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; if (f) void chibuikeIngestFile(f); }} />
                 </label>
               </div>
