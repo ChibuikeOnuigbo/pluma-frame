@@ -1,6 +1,7 @@
 // Chibuike Simple Mode — the friendly layer: presets for background, frame,
 // shadow and mockup, then Download. Studio power stays one click away.
 import { useRef, useState } from 'react';
+import { Icon } from '../Icon';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 import { chibuikeAssets } from '../../chibuike/chibuikeAssets';
 import { chibuikePaletteFromCanvas, chibuikeGradientFromPalette, chibuikeMeshPresets } from '../../chibuike/chibuikeColor';
@@ -87,19 +88,19 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
     <>
       {/* top dock */}
       <div className="pf-simple-dock" data-tut="simple-dock">
-        <button className="pf-icon-btn" title="Upload another image" onClick={() => fileRef.current?.click()}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16" /></svg>
+        <button className="pf-icon-btn" title="Upload another image" aria-label="Upload another image" onClick={() => fileRef.current?.click()}>
+          <Icon name="upload" size={15} />
         </button>
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; if (f) onIngest(f); }} />
         {(['presets', 'background', 'mockup'] as const).map(p => (
-          <button key={p} className={`pf-icon-btn${panel === p ? ' active' : ''}`} style={{ width: 'auto', padding: '0 10px', fontSize: 12.5, fontWeight: 600 }}
+          <button key={p} className={`pf-icon-btn pf-dock-tab${panel === p ? ' active' : ''}`}
             onClick={() => setPanel(panel === p ? null : p)}>
             {p === 'presets' ? 'Style' : p === 'background' ? 'Background' : 'Mockup'}
           </button>
         ))}
-        <div className="pf-sep" />
-        <button className="pf-icon-btn" title="Annotate — arrows, steps, text (Studio tools)" onClick={() => store.setMode('studio')}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
+        <div className="pf-sep pf-dock-mode" />
+        <button className="pf-icon-btn pf-dock-mode" title="Annotate — arrows, steps, text (Studio tools)" aria-label="Switch to Studio tools" onClick={() => store.setMode('studio')}>
+          <Icon name="pen" size={15} />
         </button>
         <button className="pf-btn small primary" onClick={() => void download()} disabled={busy}>
           {busy ? 'Rendering…' : 'Download'}

@@ -165,6 +165,7 @@ export class ChibuikePointerController {
       o.color = '#1a1d27';
       store.addObjects([o], 'Add text');
       store.editingTextId = o.id;
+      store.bumpReact(); // editor textarea mounts on reactRev change — must bump AFTER the id is set
       store.setTool('select');
       return;
     }
@@ -482,6 +483,7 @@ export class ChibuikePointerController {
     if (hit && hit.kind === 'text') {
       store.select([hit.id]);
       store.editingTextId = hit.id;
+      store.bumpReact(); // ensure the editor mounts even if select's bump rendered first
     }
   };
 

@@ -46,10 +46,17 @@ function ChibuikeTextEditor() {
   const id = store.editingTextId;
   const o = id ? chibuikeFindObject(store.doc, id) : null;
   useEffect(() => {
-    if (o && ref.current) {
-      ref.current.focus();
-      ref.current.select();
-    }
+    if (!o || !ref.current) return;
+    ref.current.focus();
+    ref.current.select();
+    // The editor can mount synchronously inside the pointerdown that created it;
+    // the browser's mousedown default-action then steals focus back (blur -> our
+    // onBlur closes the editor). Re-claim focus on the next frames — but never
+    // fight a genuine close (editingTextId already cleared).
+    const reclaim = () => { if (ref.current && store.editingTextId === o.id) ref.current.focus(); };
+    const raf = requestAnimationFrame(reclaim);
+    const t = setTimeout(reclaim, 80);
+    return () => { cancelAnimationFrame(raf); clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
   if (!o || o.kind !== 'text') return null;
@@ -73,7 +80,18 @@ function ChibuikeTextEditor() {
         store.setProp(o.id, { text: e.target.value }, 'Edit text');
         requestAnimationFrame(() => store.bumpRev());
       }}
-      onBlur={() => { store.editingTextId = null; store.bumpReact(); }}
+      onBlur={() => {
+        // Defer the close decision by one frame: the editor can mount inside the
+        // pointerdown that created it, and the browser's mousedown default-action
+        // blurs it before the reclaim-focus effect runs. If focus came back
+        // (reclaim won the race), keep editing; otherwise genuinely close.
+        requestAnimationFrame(() => {
+          if (store.editingTextId !== o.id) return;
+          if (document.activeElement === ref.current) return;
+          store.editingTextId = null;
+          store.bumpReact();
+        });
+      }}
       onKeyDown={e => {
         e.stopPropagation();
         if (e.key === 'Escape') { store.editingTextId = null; store.bumpReact(); }

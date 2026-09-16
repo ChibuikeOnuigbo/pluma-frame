@@ -11,3 +11,6 @@ Thumbs.db
 .audit/
 next/tests-e2e/qa-export.png
 *.tsbuildinfo
+
+# Browser-QA artefacts (screenshots, reproducible via /tmp/bqa harness)
+next/qa/

@@ -10,6 +10,7 @@ export interface ChibuikeHistoryEntry {
   at: number;
 }
 
+const CHIBUIKE_COALESCE_MS = 750; // rapid same-label edits merge into one undo step
 const CHIBUIKE_MAX_HISTORY = 80;
 
 export class ChibuikeHistory {
@@ -43,6 +44,15 @@ export class ChibuikeHistory {
     this.pending = null;
     const changed = JSON.stringify(before) !== JSON.stringify(this.current);
     if (!changed) return; // a no-op drag must not pollute undo
+    // Coalesce rapid same-label edits (typing bursts, slider drags) into ONE
+    // undo step — a ⌘Z should undo the word, not the last keystroke.
+    const last = this.past[this.past.length - 1];
+    if (last && last.label === label && Date.now() - last.at < CHIBUIKE_COALESCE_MS) {
+      last.at = Date.now();
+      this.future = [];
+      this.onDirty?.();
+      return;
+    }
     this.past.push({ label, doc: before, at: Date.now() });
     if (this.past.length > CHIBUIKE_MAX_HISTORY) this.past.shift();
     this.future = [];

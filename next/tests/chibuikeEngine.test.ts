@@ -69,6 +69,24 @@ describe('chibuike history (undo/redo)', () => {
     expect(h.undo()!.name).toBe('Untitled');
   });
 
+  it('coalesces rapid same-label edits into one undo step', () => {
+    const h = new ChibuikeHistory(chibuikeNewDoc());
+    // typing burst: 3 rapid 'Edit text' transactions
+    h.begin('Edit text'); h.liveDoc().name = 'Q'; h.commit();
+    h.begin('Edit text'); h.liveDoc().name = 'QA'; h.commit();
+    h.begin('Edit text'); h.liveDoc().name = 'QA smoke'; h.commit();
+    h.undo();
+    expect(h.liveDoc().name).toBe('Untitled'); // whole burst reverts in one step
+    h.redo();
+    expect(h.liveDoc().name).toBe('QA smoke');
+    // a DIFFERENT label between edits must break the coalescing chain
+    h.begin('Move'); h.liveDoc().objects.push(chibuikeMakeText('t', 1, 1)); h.commit();
+    h.begin('Edit text'); h.liveDoc().name = 'QA smoked'; h.commit();
+    h.undo();
+    expect(h.liveDoc().name).toBe('QA smoke'); // only the last edit reverts
+    expect(h.liveDoc().objects.length).toBe(1);
+  });
+
   it('undo label introspection', () => {
     const h = new ChibuikeHistory(chibuikeNewDoc());
     h.begin('Add text');

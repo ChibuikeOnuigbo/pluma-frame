@@ -92,6 +92,7 @@ kbd {
 
 /* ── app shell ─────────────────────────────────────────────────────────── */
 .pf-app { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.pf-main { position: relative; min-width: 0; }
 .pf-app.pf-studio { display: grid; grid-template-rows: var(--pf-topbar-h) 1fr; height: 100vh; }
 
 /* ── landing ───────────────────────────────────────────────────────────── */
@@ -361,8 +362,10 @@ kbd {
   display: flex; gap: 3px; align-items: center; padding: 4px;
   background: rgba(22,25,35,.92); border: 1px solid var(--pf-border-2); border-radius: 11px;
   box-shadow: var(--pf-shadow-1); max-width: calc(100% - 20px); overflow-x: auto;
-  backdrop-filter: blur(8px); z-index: 30;
+  backdrop-filter: blur(8px); z-index: 30; scrollbar-width: none;
 }
+.pf-simple-dock::-webkit-scrollbar { display: none; }
+.pf-dock-tab { width: auto !important; padding: 0 10px; font-size: 12.5px; font-weight: 600; }
 .pf-simple-side {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 240px; max-width: calc(100vw - 24px); z-index: 30;
@@ -519,6 +522,13 @@ kbd {
   .pf-inspector.pf-inspector-open { transform: none; }
 }
 
+/* tiny screens: dock drops the annotate button (topbar already toggles mode) */
+@media (max-width: 480px) {
+  .pf-simple-dock { gap: 1px !important; left: calc(50% + 23px) !important; max-width: calc(100vw - 66px) !important; }
+  .pf-simple-dock .pf-dock-mode { display: none; }
+  .pf-simple-dock .pf-dock-tab { padding: 0 4px !important; font-size: 11px !important; }
+}
+
 /* touch: no hover tooltips */
 @media (hover: none) {
   .pf-tip::after { display: none; }
@@ -531,7 +541,13 @@ kbd {
     left: 10px !important; right: 10px !important; width: auto !important; top: auto !important;
     bottom: 74px !important; transform: none !important; max-height: 46vh;
   }
-  .pf-simple-dock { top: 8px; }
+  .pf-simple-dock {
+    top: 8px; left: calc(50% + 26px); max-width: calc(100vw - 60px);
+    gap: 2px; padding: 3px 4px;
+  }
+  .pf-dock-tab { padding: 0 7px; font-size: 11.5px; }
+  .pf-simple-dock .pf-btn.small { font-size: 11.5px; padding: 5px 9px; }
+  .pf-simple-dock .pf-icon-btn { width: 26px; height: 26px; flex: none; }
   .pf-timeline { height: 128px; }
   .pf-demo { aspect-ratio: 16/11; }
   .pf-landing-hero { padding-top: 26px; }
