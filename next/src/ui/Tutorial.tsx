@@ -42,10 +42,10 @@ export function Tutorial() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
-          {ch > 0 && <button className="pf-btn small" onClick={() => setCh(ch - 1)}>← Previous</button>}
+          {ch > 0 && <button className="pf-btn small" onClick={() => setCh(ch - 1)}>Previous</button>}
           {ch < CHAPTERS.length - 1
-            ? <button className="pf-btn small primary" onClick={() => setCh(ch + 1)}>Next chapter →</button>
-            : <a className="pf-btn small primary" href="#/studio">Try it now →</a>}
+            ? <button className="pf-btn small primary" onClick={() => setCh(ch + 1)}>Next chapter</button>
+            : <a className="pf-btn small primary" href="#/studio">Try it now</a>}
           <button className="pf-btn small" onClick={() => { chibuikeResetTutorial(); location.hash = '#/studio'; location.reload(); }}>
             Restart interactive tutorial in Studio
           </button>

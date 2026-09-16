@@ -41,7 +41,8 @@ export function Landing() {
     const doc = chibuikeNewDoc({ width: 1280, height: 680, name: 'Demo' });
     demoDoc.current = doc;
     const cv = canvasRef.current!;
-    const ctx = cv.getContext('2d')!;
+    const ctx = cv.getContext('2d');
+    if (!ctx) return; // no 2d context (test env / ancient browser) — render static markup only
     cv.width = 1280; cv.height = 680;
 
     let t0 = performance.now();
@@ -157,7 +158,6 @@ export function Landing() {
         <p>Drop in a screenshot. Get a polished marketing visual — background, depth, shadow, annotations — in seconds. Free, fast, runs entirely in your browser.</p>
         <div className="pf-cta-row">
           <label className="pf-btn primary" style={{ cursor: 'pointer' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16" /></svg>
             Upload image
             <input type="file" accept="image/*" hidden onChange={e => {
               const f = e.target.files?.[0];
@@ -166,7 +166,7 @@ export function Landing() {
               if (f) (window as unknown as { __chibuikePendingFile?: File }).__chibuikePendingFile = f;
             }} />
           </label>
-          <a className="pf-btn" href="#/studio">Open Studio →</a>
+          <a className="pf-btn" href="#/studio">Open Studio</a>
         </div>
       </header>
 
@@ -188,7 +188,7 @@ export function Landing() {
         </div>
         <div className="pf-feat">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5" /></svg>
-          <h3>Simple → Studio</h3>
+          <h3>Simple to Studio</h3>
           <p>One-click presets when you want speed. Layers, transforms, animation and precise controls when you don't.</p>
         </div>
         <div className="pf-feat">

@@ -6,6 +6,8 @@ import { chibuikeFindObject } from '../../chibuike/chibuikeDoc';
 import type { ChibuikeObject } from '../../chibuike/chibuikeTypes';
 import { CHIBUIKE_FONTS } from '../../chibuike/chibuikeText';
 import { CHIBUIKE_ICONS } from '../../chibuike/chibuikeIcons';
+import { Icon } from '../Icon';
+import { Select } from '../Overlay';
 
 /* ── primitives ─────────────────────────────────────────────────────────── */
 function Num({ value, onChange, unit, step = 1, min, max, label }: {
@@ -87,13 +89,13 @@ function ImageProps({ o }: { o: Extract<ChibuikeObject, { kind: 'image' }> }) {
           </div>
         </Row>
         <div className="pf-row">
-          <button className="pf-chip" onClick={() => store.startCrop()} data-tut="crop">✂ Crop</button>
+          <button className="pf-chip" onClick={() => store.startCrop()} data-tut="crop">Crop</button>
           <button className="pf-chip" onClick={() => store.resetCrop()}>Reset crop</button>
         </div>
         <div className="pf-row">
-          <button className="pf-chip" onClick={() => set({ flipX: !o.flipX })}>Flip ↔</button>
-          <button className="pf-chip" onClick={() => set({ flipY: !o.flipY })}>Flip ↕</button>
-          <button className="pf-chip" onClick={() => set({ rotation: Math.round((o.rotation + 90) % 360) })}>+90°</button>
+          <button className="pf-chip" onClick={() => set({ flipX: !o.flipX })}>Flip H</button>
+          <button className="pf-chip" onClick={() => set({ flipY: !o.flipY })}>Flip V</button>
+          <button className="pf-chip" onClick={() => set({ rotation: Math.round((o.rotation + 90) % 360) })}>Rotate 90</button>
         </div>
       </Section>
       <Section title="Perspective tilt" onReset={() => set({ tilt: null })}>
@@ -164,10 +166,7 @@ function TextProps({ o }: { o: Extract<ChibuikeObject, { kind: 'text' }> }) {
     <>
       <Section title="Type">
         <Row label="Font">
-          <select value={o.font} onChange={e => set({ font: e.target.value })}
-            style={{ background: 'var(--pf-bg-2)', border: '1px solid var(--pf-border)', borderRadius: 6, padding: '4px 6px', width: '100%' }}>
-            {CHIBUIKE_FONTS.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
-          </select>
+          <Select value={o.font} options={CHIBUIKE_FONTS.map(f => ({ value: f.id, label: f.label }))} onChange={v => set({ font: v })} label="Font" width={undefined as never} />
         </Row>
         <Row label="Size"><Num value={o.size} onChange={v => set({ size: Math.max(6, v) })} min={6} /></Row>
         <Row label="Weight">
@@ -180,7 +179,9 @@ function TextProps({ o }: { o: Extract<ChibuikeObject, { kind: 'text' }> }) {
         <Row label="Align">
           <div className="pf-seg grow">
             {(['left', 'center', 'right'] as const).map(a => (
-              <button key={a} className={o.align === a ? 'on' : ''} onClick={() => set({ align: a })}>{a === 'left' ? '⯇' : a === 'center' ? '≡' : '⯈'}</button>
+              <button key={a} className={o.align === a ? 'on' : ''} onClick={() => set({ align: a })} aria-label={`Align ${a}`} title={`Align ${a}`}>
+                <Icon name={a === 'left' ? 'alignLeft' : a === 'center' ? 'alignCenterH' : 'alignRight'} size={14} />
+              </button>
             ))}
           </div>
         </Row>
@@ -379,12 +380,12 @@ function IconProps({ o }: { o: Extract<ChibuikeObject, { kind: 'icon' }> }) {
   return (
     <Section title="Icon">
       <Row label="Fill"><Color label="Fill" value={o.fill} onChange={v => set({ fill: v })} /></Row>
-      <Row label="Library">
-        <div className="pf-grid3">
-          {CHIBUIKE_ICONS.slice(0, 9).map(ic => (
-            <button key={ic.name} title={ic.name} className="pf-menu-item" style={{ justifyContent: 'center', padding: 6 }}
+      <Row label="Swap">
+        <div className="pf-grid5">
+          {CHIBUIKE_ICONS.slice(0, 10).map(ic => (
+            <button key={ic.name} title={ic.name} className="pf-icon-tile" aria-label={ic.name}
               onClick={() => set({ path: ic.path })}>
-              <svg width="16" height="16" viewBox="0 0 24 24"><path d={ic.path} fill="currentColor" /></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24"><path d={ic.path} fill="currentColor" /></svg>
             </button>
           ))}
         </div>
@@ -420,10 +421,7 @@ function MockupProps({ o }: { o: Extract<ChibuikeObject, { kind: 'mockup' }> }) 
     <>
       <Section title="Device">
         <Row label="Device">
-          <select value={o.device} onChange={e => set({ device: e.target.value as never })}
-            style={{ background: 'var(--pf-bg-2)', border: '1px solid var(--pf-border)', borderRadius: 6, padding: '4px 6px', width: '100%' }}>
-            {['browser', 'browser-dark', 'mac', 'laptop', 'phone'].map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
+          <Select value={o.device} options={(['browser','browser-dark','mac','laptop','phone'] as const).map(d => ({ value: d, label: d === 'browser-dark' ? 'Browser dark' : d[0].toUpperCase()+d.slice(1) }))} onChange={v => set({ device: v })} label="Device" />
         </Row>
         {o.device.startsWith('browser') && <Row label="URL"><input type="text" value={o.urlText} onChange={e => set({ urlText: e.target.value })} onKeyDown={e => e.stopPropagation()} /></Row>}
         <Row label="Fit">
@@ -461,10 +459,7 @@ function TransformProps({ o }: { o: ChibuikeObject }) {
       <Row label="Rotation"><Slider label="Rotation" value={o.rotation} min={-180} max={180} onChange={v => set({ rotation: v })} /><Num value={o.rotation} onChange={v => set({ rotation: v })} unit="°" /></Row>
       <Row label="Opacity"><Slider label="Opacity" value={o.opacity} min={0} max={1} step={0.01} onChange={v => set({ opacity: v })} /></Row>
       <Row label="Blend">
-        <select value={o.blend} onChange={e => set({ blend: e.target.value as never })}
-          style={{ background: 'var(--pf-bg-2)', border: '1px solid var(--pf-border)', borderRadius: 6, padding: '4px 6px', width: '100%' }}>
-          {['normal', 'multiply', 'screen', 'overlay', 'soft-light', 'difference'].map(b => <option key={b} value={b}>{b}</option>)}
-        </select>
+        <Select value={o.blend} options={(['normal','multiply','screen','overlay','soft-light','difference'] as const).map(b => ({ value: b, label: b[0].toUpperCase()+b.slice(1) }))} onChange={v => set({ blend: v })} label="Blend mode" />
       </Row>
     </Section>
   );
@@ -484,10 +479,11 @@ function ArrangeSection() {
   };
   return (
     <Section title="Arrange">
-      <div className="pf-grid3">
-        <button className="pf-chip" onClick={() => store.reorder('front')}>Front</button>
-        <button className="pf-chip" onClick={() => store.reorder('forward')}>▲</button>
-        <button className="pf-chip" onClick={() => store.reorder('backward')}>▼</button>
+      <div className="pf-grid4">
+        <button className="pf-sq" title="Bring to front" aria-label="Bring to front" onClick={() => store.reorder('front')}><Icon name="toFront" size={15} /></button>
+        <button className="pf-sq" title="Bring forward" aria-label="Bring forward" onClick={() => store.reorder('forward')}><Icon name="up" size={15} /></button>
+        <button className="pf-sq" title="Send backward" aria-label="Send backward" onClick={() => store.reorder('backward')}><Icon name="down" size={15} /></button>
+        <button className="pf-sq" title="Send to back" aria-label="Send to back" onClick={() => store.reorder('back')}><Icon name="toBack" size={15} /></button>
       </div>
       <div className="pf-grid3">
         {(['left', 'hcenter', 'right'] as const).map(k => (
@@ -501,8 +497,8 @@ function ArrangeSection() {
       </div>
       {store.selected().length > 2 && (
         <div className="pf-grid2">
-          <button className="pf-chip" onClick={() => store.distribute('h')}>Dist ↔</button>
-          <button className="pf-chip" onClick={() => store.distribute('v')}>Dist ↕</button>
+          <button className="pf-chip" onClick={() => store.distribute('h')}><Icon name="distributeH" size={13} /> Distribute</button>
+          <button className="pf-chip" onClick={() => store.distribute('v')}><Icon name="distributeV" size={13} /> Distribute</button>
         </div>
       )}
       <div className="pf-grid2">
@@ -552,13 +548,10 @@ function LayersPanel() {
             onDoubleClick={() => setRenaming(o.id)}
           >
             <button
-              className="pf-icon-btn" style={{ width: 22, height: 22, opacity: o.visible ? 1 : 0.4 }}
-              title="Show / hide"
+              className="pf-icon-btn sm" title={o.visible ? 'Hide' : 'Show'} aria-label={o.visible ? 'Hide layer' : 'Show layer'}
               onClick={e => { e.stopPropagation(); store.toggleVisible([o.id]); }}
             >
-              {o.visible
-                ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
-                : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3l18 18M10.5 5.2A10.8 10.8 0 0112 5c6.5 0 10 7 10 7a17 17 0 01-3 3.6M6.6 6.6A16.9 16.9 0 002 12s3.5 7 10 7a10 10 0 004.2-.9" /></svg>}
+              <Icon name={o.visible ? 'eye' : 'eyeOff'} size={13} />
             </button>
             {renaming === o.id ? (
               <input type="text" defaultValue={o.name} autoFocus
@@ -567,13 +560,10 @@ function LayersPanel() {
             ) : <span className="nm">{o.name}</span>}
             <span className="k"><KindGlyph kind={o.kind} /></span>
             <button
-              className="pf-icon-btn" style={{ width: 22, height: 22, opacity: o.locked ? 1 : 0.4 }}
-              title="Lock"
+              className="pf-icon-btn sm" title={o.locked ? 'Unlock' : 'Lock'} aria-label={o.locked ? 'Unlock layer' : 'Lock layer'}
               onClick={e => { e.stopPropagation(); store.toggleLock([o.id]); }}
             >
-              {o.locked
-                ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="6" y="11" width="12" height="9" rx="2" /><path d="M9 11V8a3 3 0 016 0v3" /></svg>
-                : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="6" y="11" width="12" height="9" rx="2" /><path d="M9 11V8a3 3 0 015.9-.7" /></svg>}
+              <Icon name={o.locked ? 'lock' : 'unlock'} size={13} />
             </button>
           </div>
         );
@@ -583,11 +573,11 @@ function LayersPanel() {
 }
 
 function KindGlyph({ kind }: { kind: string }) {
-  const map: Record<string, string> = {
-    image: '🖼', text: 'T', rect: '▭', ellipse: '◯', line: '╱', arrow: '↗', pen: '✎',
-    blur: '▒', spotlight: '☉', number: '②', callout: '💬', qr: '▩', icon: '★', mockup: '💻', magnify: '🔍', badge: '▤',
+  const map: Record<string, Parameters<typeof Icon>[0]['name']> = {
+    image: 'image', text: 'type', rect: 'square', ellipse: 'circle', line: 'line', arrow: 'arrow', pen: 'pen',
+    blur: 'pixels', spotlight: 'focus', number: 'steps', callout: 'message', qr: 'qr', icon: 'star', mockup: 'monitor', magnify: 'zoomSearch', badge: 'badge',
   };
-  return <span className="pf-tiny">{map[kind] ?? '•'}</span>;
+  return <span className="pf-kind"><Icon name={map[kind] ?? 'square'} size={12} /></span>;
 }
 
 /* ── animate tab ────────────────────────────────────────────────────────── */
@@ -613,10 +603,7 @@ function AnimatePanel() {
               <Row label="Duration"><Slider label="Duration" value={o.anim.duration} min={0.2} max={4} step={0.05} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, duration: v } }, 'Duration')} /><Num value={o.anim.duration} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, duration: v } }, 'Duration')} unit="s" step={0.05} min={0.1} /></Row>
               <Row label="Delay"><Slider label="Delay" value={o.anim.delay} min={0} max={4} step={0.05} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, delay: v } }, 'Delay')} /><Num value={o.anim.delay} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, delay: v } }, 'Delay')} unit="s" step={0.05} min={0} /></Row>
               <Row label="Easing">
-                <select value={o.anim.easing} onChange={e => store.setProp(o.id, { anim: { ...o.anim!, easing: e.target.value as never } }, 'Easing')}
-                  style={{ background: 'var(--pf-bg-2)', border: '1px solid var(--pf-border)', borderRadius: 6, padding: '4px 6px', width: '100%' }}>
-                  {['linear', 'ease', 'ease-out', 'ease-in', 'ease-in-out', 'spring', 'bounce-out', 'back-out'].map(e => <option key={e} value={e}>{e}</option>)}
-                </select>
+                <Select value={o.anim.easing} options={(['linear','ease','ease-out','ease-in','ease-in-out','spring','bounce-out','back-out'] as const).map(e => ({ value: e, label: e }))} onChange={v => store.setProp(o.id, { anim: { ...o.anim!, easing: v } }, 'Easing')} label="Easing" />
               </Row>
               <Row label="Loop"><input type="checkbox" checked={o.anim.loop} onChange={e => store.setProp(o.id, { anim: { ...o.anim!, loop: e.target.checked } }, 'Loop')} /><span className="pf-tiny pf-muted">float · pulse · shake</span></Row>
               <div className="pf-row">
@@ -627,7 +614,7 @@ function AnimatePanel() {
                     anims.forEach((x, i) => { x.anim!.delay = i * 0.15; });
                   });
                 }}>Stagger all</button>
-                <button className="pf-chip" onClick={() => store.play()}>▶ Preview</button>
+                <button className="pf-chip" onClick={() => store.play()}>Preview</button>
               </div>
             </>
           )}
@@ -687,10 +674,7 @@ function WatermarkSection() {
       {w && (
         <>
           <Row label="Position">
-            <select value={w.position} onChange={e => store.setWatermark({ ...w, position: Number(e.target.value) as never })}
-              style={{ background: 'var(--pf-bg-2)', border: '1px solid var(--pf-border)', borderRadius: 6, padding: '4px 6px' }}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(p => <option key={p} value={p}>{['top left', 'top', 'top right', 'left', 'center', 'right', 'bottom left', 'bottom', 'bottom right'][p]}</option>)}
-            </select>
+            <Select value={String(w.position)} options={[0,1,2,3,4,5,6,7,8].map(p => ({ value: String(p), label: ['Top left','Top','Top right','Left','Center','Right','Bottom left','Bottom','Bottom right'][p] }))} onChange={v => store.setWatermark({ ...w, position: Number(v) as never })} label="Watermark position" />
           </Row>
           <Row label="Size"><Slider label="Watermark size" value={w.size} min={10} max={80} onChange={v => store.setWatermark({ ...w, size: v })} /></Row>
           <Row label="Opacity"><Slider label="Watermark opacity" value={w.opacity} min={0.05} max={1} step={0.01} onChange={v => store.setWatermark({ ...w, opacity: v })} /></Row>

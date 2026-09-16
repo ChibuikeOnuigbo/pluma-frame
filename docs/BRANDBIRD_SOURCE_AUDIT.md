@@ -12,6 +12,8 @@ an original, independent implementation. This document records the evidence.
   Next.js page capture, not source code) was provided as design reference.
 - It was extracted once, read-only, to `.audit/brandbird-extracted/`
   (70 entries: 41 files in 29 directories, incl. directory names).
+- Extraction tooling: custom RAR reader in `/tmp/rartool/`; full file manifest
+  with sizes/hashes in `/tmp/rar-manifest.tsv` (session artefacts, not committed).
 - The archive is **not** part of the product tree and is **never** shipped,
   imported, or copied from. It is excluded from the build and from Git.
 
@@ -61,7 +63,7 @@ Case-insensitive substring scan of `_app-b0bee8b57a907b9e.js`:
   in the BrandBird capture (Inter, IBM Plex Mono, Lora, Shadows Into Light)
   were **not** copied — neither binaries nor CSS.
 - **Demo images:** 3 PNGs in `next/public/demo/` generated specifically for
-  this project (see `next/ASSET_LICENSES.md`).
+  this project (see `docs/ASSET_LICENSES.md`).
 - **Favicon:** original SVG in `next/public/favicon.svg`.
 
 ## 5. Design-token comparison

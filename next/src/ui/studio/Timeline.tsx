@@ -1,6 +1,7 @@
 // Chibuike timeline — a light, canvas-drawn keyframe strip: ruler, tracks,
 // animated clips, draggable playhead. Not an NLE; never will be.
 import { useEffect, useRef } from 'react';
+import { Icon } from '../Icon';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 
 export function Timeline() {
@@ -87,13 +88,11 @@ export function Timeline() {
   return (
     <div className="pf-timeline" data-tut="timeline">
       <div className="pf-tl-toolbar">
-        <button className="pf-icon-btn" title="Play / pause (Space)" onClick={() => store.playing ? store.stop() : store.play()}>
-          {store.playing
-            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
-            : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z" /></svg>}
+        <button className="pf-icon-btn" title="Play / pause" aria-label={store.playing ? 'Pause' : 'Play'} onClick={() => store.playing ? store.stop() : store.play()}>
+          <Icon name={store.playing ? 'pause' : 'play'} size={14} />
         </button>
-        <button className="pf-icon-btn" title="Stop" onClick={() => store.stop()}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+        <button className="pf-icon-btn" title="Stop" aria-label="Stop" onClick={() => store.stop()}>
+          <Icon name="stopSquare" size={13} />
         </button>
         <span className="pf-tiny pf-muted" style={{ fontFamily: 'var(--pf-mono)' }}>{store.playhead.toFixed(2)}s / {store.animDuration.toFixed(1)}s</span>
         <div className="pf-sep" />

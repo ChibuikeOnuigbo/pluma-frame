@@ -79,7 +79,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
       if (warnings.some(w => w.level === 'warn')) store.toast(warnings.find(w => w.level === 'warn')!.msg, 'warn');
       const blob = await chibuikeEncode(store.doc, es.format, es.scale, es.quality, es.transparent);
       chibuikeDownload(blob, `${store.doc.name || 'pluma'}.${es.format === 'jpeg' ? 'jpg' : es.format}`);
-      store.toast('Downloaded ✦', 'ok');
+      store.toast('Downloaded', 'ok');
     } catch (err) { store.toast(String(err), 'error'); } finally { setBusy(false); }
   };
 
@@ -102,7 +102,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
         </button>
         <button className="pf-btn small primary" onClick={() => void download()} disabled={busy}>
-          {busy ? 'Rendering…' : '⬇ Download'}
+          {busy ? 'Rendering…' : 'Download'}
         </button>
       </div>
 
@@ -150,7 +150,7 @@ export function SimpleOverlay({ onIngest }: { onIngest: (f: File) => void }) {
                   );
                 })}
               </div>
-              <button className="pf-chip" style={{ width: '100%', marginBottom: 10 }} onClick={randomFromImage}>🎲 Match my image</button>
+              <button className="pf-chip" style={{ width: '100%', marginBottom: 10 }} onClick={randomFromImage}>Match my image</button>
               <h4>Image background</h4>
               <div className="pf-row">
                 <label className="pf-chip" style={{ cursor: 'pointer' }}>

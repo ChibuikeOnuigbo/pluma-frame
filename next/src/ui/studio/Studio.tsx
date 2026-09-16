@@ -306,8 +306,8 @@ export default function Studio() {
             {store.uiMode === 'studio' && store.doc.objects.length === 0 && (
               <div className="pf-upload-hero">
                 <label className="big" style={{ cursor: 'pointer' }}>
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16" /></svg>
-                  <div><b>Drop a screenshot here</b><br /><span className="pf-muted pf-tiny">or paste from clipboard · click to browse</span></div>
+                  <div><b>Drop a screenshot here</b></div>
+                  <span className="pf-muted pf-tiny">or paste from clipboard · click to browse</span>
                   <input type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; if (f) void chibuikeIngestFile(f); }} />
                 </label>
               </div>
@@ -327,6 +327,7 @@ export default function Studio() {
       </div>
       <ChibuikeModals />
       <ChibuikeToasts />
+      {coach && <Coach onDone={() => setCoach(false)} />}
       {recovered && (
         <div className="pf-modal-veil" style={{ zIndex: 400 }}>
           <div className="pf-modal" style={{ maxWidth: 420 }}>

@@ -1,6 +1,7 @@
 // Chibuike modals — command palette, export desk, size presets, shortcuts.
 // Small, focused surfaces; scroll internally; own their own keys.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Icon } from '../Icon';
 import { store, useChibuike } from '../../chibuike/chibuikeStore';
 import { chibuikeExportWarnings, chibuikeEncode, chibuikeDownload, chibuikeExportSVG, chibuikeExportSizes, CHIBUIKE_SOCIAL_SIZES, CHIBUIKE_DEVICE_SIZES } from '../../chibuike/chibuikeExport';
 import { chibuikeEncodeWebM } from '../../chibuike/chibuikeVideo';
@@ -108,19 +109,22 @@ function ExportModal({ onClose }: { onClose: () => void }) {
         const blob = await chibuikeEncode(doc, kind as 'png' | 'jpeg' | 'webp', es.scale, es.quality, es.transparent);
         chibuikeDownload(blob, `${doc.name || 'pluma'}.${kind === 'jpeg' ? 'jpg' : kind}`);
       }
-      store.toast(`Exported ${kind.toUpperCase()} ✓`, 'ok');
+      store.toast(`Exported ${kind.toUpperCase()}`, 'ok');
     } catch (err) { store.toast(`Export failed: ${String(err)}`, 'error'); } finally { setBusy(null); }
   };
 
   return (
     <Veil onClose={onClose} wide>
-      <div className="pf-modal-head"><h3>Export “{doc.name}”</h3><button className="pf-icon-btn" onClick={onClose}>✕</button></div>
+      <div className="pf-modal-head"><h3>Export “{doc.name}”</h3><button className="pf-icon-btn" title="Close" aria-label="Close" onClick={onClose}><Icon name="x" size={15} /></button></div>
       <div className="pf-modal-body">
         {warnings.length > 0 && (
           <div style={{ marginBottom: 12 }}>
             {warnings.map((w, i) => (
               <div key={i} className="pf-error-panel" style={{ borderColor: w.level === 'warn' ? 'rgba(255,194,71,.5)' : 'var(--pf-border-2)', background: 'rgba(255,194,71,.06)', color: '#ffd98f', marginBottom: 6 }}>
-                {w.level === 'warn' ? '⚠ ' : 'ℹ '}{w.msg}
+                <span style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <Icon name={w.level === 'warn' ? 'alert' : 'info'} size={15} />
+                  <span>{w.msg}</span>
+                </span>
               </div>
             ))}
           </div>
@@ -174,7 +178,7 @@ function SizesModal({ onClose }: { onClose: () => void }) {
   const [custom, setCustom] = useState({ w: store.doc.width, h: store.doc.height });
   return (
     <Veil onClose={onClose} wide>
-      <div className="pf-modal-head"><h3>Canvas sizes</h3><button className="pf-icon-btn" onClick={onClose}>✕</button></div>
+      <div className="pf-modal-head"><h3>Canvas sizes</h3><button className="pf-icon-btn" title="Close" aria-label="Close" onClick={onClose}><Icon name="x" size={15} /></button></div>
       <div className="pf-modal-body">
         <h4 className="pf-tiny pf-muted" style={{ textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 8px' }}>Social</h4>
         <div className="pf-grid3" style={{ marginBottom: 16 }}>
@@ -215,10 +219,10 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
     ['V / H', 'Select · Pan'],
     ['T', 'Text'], ['R', 'Rectangle'], ['A', 'Arrow'], ['B', 'Pen'], ['X', 'Blur/redact'], ['C', 'Crop image'],
     ['Space', 'Play / pause animation'],
-    ['Ctrl/⌘ Z · Shift Z', 'Undo · Redo'],
-    ['Ctrl/⌘ S', 'Save locally'], ['Ctrl/⌘ E', 'Export'], ['Ctrl/⌘ Shift P', 'Command palette'],
-    ['Ctrl/⌘ D', 'Duplicate'], ['Ctrl/⌘ G · Shift G', 'Group · Ungroup'],
-    ['Ctrl/⌘ C · V · X', 'Copy · Paste · Cut'],
+    ['Ctrl / Cmd Z, Shift Z', 'Undo · Redo'],
+    ['Ctrl / Cmd S', 'Save locally'], ['Ctrl / Cmd E', 'Export'], ['Ctrl / Cmd Shift P', 'Command palette'],
+    ['Ctrl / Cmd D', 'Duplicate'], ['Ctrl / Cmd G, Shift G', 'Group · Ungroup'],
+    ['Ctrl / Cmd C, V, X', 'Copy · Paste · Cut'],
     ['[ · ]', 'Send backward · forward'],
     ['Arrows', 'Nudge (Shift = 10px)'],
     ['0 · 1', 'Fit · 100%'],
@@ -228,7 +232,7 @@ function ShortcutsModal({ onClose }: { onClose: () => void }) {
   ];
   return (
     <Veil onClose={onClose}>
-      <div className="pf-modal-head"><h3>Shortcuts</h3><button className="pf-icon-btn" onClick={onClose}>✕</button></div>
+      <div className="pf-modal-head"><h3>Shortcuts</h3><button className="pf-icon-btn" title="Close" aria-label="Close" onClick={onClose}><Icon name="x" size={15} /></button></div>
       <div className="pf-modal-body">
         {rows.map(([k, v]) => (
           <div key={k} className="pf-row" style={{ justifyContent: 'space-between' }}>
